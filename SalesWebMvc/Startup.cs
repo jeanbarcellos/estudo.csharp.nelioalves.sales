@@ -39,12 +39,13 @@ namespace SalesWebMvc
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
+            // Define o Microsoft.AspNetCore.Mvc.CompatibilityVersion para ASP.NET Core MVC para o aplicativo.
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            // Definição do Banco de dados
             services.AddDbContext<SalesWebMvcContext>(options =>
                     options.UseMySql(Configuration.GetConnectionString("SalesWebMvcContext"), builder =>
-builder.MigrationsAssembly("SalesWebMvc")));
+                        builder.MigrationsAssembly("SalesWebMvc")));
 
             // Registro dos Services no Container
             services.AddScoped<SeedingService>();
@@ -52,6 +53,11 @@ builder.MigrationsAssembly("SalesWebMvc")));
             services.AddScoped<DepartmentService>();
             services.AddScoped<SalesRecordService>();
 
+            // RESUMO:
+            // services.Configure = Registra uma ação usada para configurar um tipo particular de opções
+            // services.AddMvc = Define o Microsoft.AspNetCore.Mvc.CompatibilityVersion para ASP.NET Core MVC para o aplicativo.
+            // services.AddScoped = Adiciona um serviço com escopo do tipo especificado em TService ao Microsoft.Extensions.DependencyInjection.IServiceCollection.
+            // services.AddDbContext = Registra o contexto fornecido como um serviço
         }
 
         // Este método é chamado pelo tempo de execução. 
@@ -66,23 +72,39 @@ builder.MigrationsAssembly("SalesWebMvc")));
                 SupportedUICultures = new List<CultureInfo> { enUS }
             };
 
+            // Definir automaticamente as informações de cultura para solicitações com base nas informações fornecidas pelo cliente.
             app.UseRequestLocalization(localizationOptions);
 
+            // Verifica qual ambiente o App se encontra
             if (env.IsDevelopment())
             {
+                // Captura instâncias System.Exception síncronas e assíncronas do pipeline e gera respostas de erro HTML
                 app.UseDeveloperExceptionPage();
+
+                // Popula o banco de dados default
                 seedingService.Seed();
             }
             else
             {
+                // Adiciona um middleware ao pipeline que captura exceções, registra-as, redefine o caminho da solicitação e reexecuta a solicitação. 
+                // A solicitação não será executada novamente se a resposta já tiver começado.
                 app.UseExceptionHandler("/Home/Error");
+
+                // Adiciona middleware para usar HSTS, que adiciona o cabeçalho Strict-Transport-Security.
                 app.UseHsts();
             }
 
+            // Adiciona middleware para redirecionar solicitações HTTP para HTTPS.
             app.UseHttpsRedirection();
+
+            // Ativa o envio de arquivo estático para o caminho da solicitação atual. 
+            // Permite que os arquivos estáticos sejam atendidos
             app.UseStaticFiles();
+
+            // Ativa os recursos de política de cookies
             app.UseCookiePolicy();
 
+            // Adiciona MVC ao pipeline de execução de solicitação Microsoft.AspNetCore.Builder.IApplicationBuilder
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

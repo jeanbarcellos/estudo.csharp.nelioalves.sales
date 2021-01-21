@@ -1,4 +1,4 @@
-# Projeto: Sistema Web com ASP .NET Core MVC e Entity Framework
+# Projeto: Sistema Web com ASP .NET Core MVC e Entity Framework (Seção 18)
 
 Projeto pertencente ao '**Curso C# COMPLETO 2020 Programação Orientada a Objetos + Projetos**'
 
